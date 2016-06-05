@@ -56,8 +56,8 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
       }
     }		//end tetField initialization
 
-    playPiece = new TetrisPiece(new Point(3,0), (int)(7*Math.random()));
-    //playPiece = new TetrisPiece(new Point(3,0), STICK);
+    // playPiece = new TetrisPiece(new Point(3,0), (int)(7*Math.random()));
+    playPiece = new TetrisPiece(new Point(3,0), nextPiece);
 
     timepiece = new Timer(1000,this);
     timepiece.start();
@@ -862,23 +862,23 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     //int type = playPiece.getType();
-    if(key == KeyEvent.VK_LEFT){
+    if(key == KeyEvent.VK_LEFT || key == KeyEvent.VK_H){
       playPiece.moveLeft();
       repaint();
     }
-    else if(key == KeyEvent.VK_RIGHT){
+    else if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_L) {
       playPiece.moveRight();
       repaint();
     }
-    else if(key == KeyEvent.VK_DOWN){
+    else if(key == KeyEvent.VK_DOWN || key == KeyEvent.VK_J) {
       playPiece.dropIt();
       repaint();
     }
-    else if(key == KeyEvent.VK_Z){
+    else if(key == KeyEvent.VK_Z || key == KeyEvent.VK_S) {
       playPiece.rotateLeft();
       repaint();
     }
-    else if(key == KeyEvent.VK_X){
+    else if(key == KeyEvent.VK_X || key == KeyEvent.VK_D) {
       playPiece.rotateRight();
       repaint();
     }

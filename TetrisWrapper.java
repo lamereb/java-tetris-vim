@@ -27,7 +27,7 @@ public class TetrisWrapper extends JPanel {
   private static final int PWIDTH = (10*BLOCK_SIZE + 6*BLOCK_SIZE + 3*BORDER_SIZE);
   private static final int PHEIGHT = (18*BLOCK_SIZE + 2*BORDER_SIZE);
 
-  JLabel linesDisplay, scoreDisplay;	
+  JLabel linesDisplay, scoreDisplay, nextPieceDisplay;	
   JTextArea infoBox;
   String linesMsg, scoreMsg, infoMsg;
 
@@ -58,12 +58,31 @@ public class TetrisWrapper extends JPanel {
   }	
 
   // nested class for panel displaying next piece
-  public class NextPiecePanel extends JPanel {
+  public class NextPiecePanel extends JPanel implements ActionListener {
+    public String nextPieceNum;
+    public Timer findNextPiece;
 
     // default constructor	
     public NextPiecePanel(){
       setPreferredSize(new Dimension(BLOCK_SIZE*6, BLOCK_SIZE*6));
       setBackground(Color.DARK_GRAY);						
+
+      findNextPiece = new Timer(500, this);
+      findNextPiece.start();
+      nextPieceNum = "0";
+      nextPieceDisplay = new JLabel(nextPieceNum);
+      add(nextPieceDisplay);
+    }
+
+    public void paintComponent(Graphics g){
+      super.paintComponent(g);
+      nextPieceNum = "Next Piece:" + String.valueOf(contentLt.getNextPiece());
+      nextPieceDisplay.setText(nextPieceNum);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      repaint();
     }
   }
 
@@ -72,7 +91,7 @@ public class TetrisWrapper extends JPanel {
 
     public int linesTotal;		
     public Timer getLines;	
-    JSlider hold;
+    // JSlider hold;
 
     public ScorePanel(){
       setPreferredSize(new Dimension(BLOCK_SIZE*6, BLOCK_SIZE*12));
