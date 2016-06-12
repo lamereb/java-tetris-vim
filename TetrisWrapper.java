@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.Timer;
 import javax.swing.event.*;
 
@@ -71,6 +70,7 @@ public class TetrisWrapper extends JPanel {
       findNextPiece.start();
       nextPieceNum = "0";
       nextPieceDisplay = new JLabel(nextPieceNum);
+      nextPieceDisplay.setForeground(Color.BLACK);
       add(nextPieceDisplay);
     }
 
@@ -103,10 +103,11 @@ public class TetrisWrapper extends JPanel {
 
       linesMsg = "Lines:  0";
       scoreMsg = "Score:  0";
-      infoMsg = "Z: rotate left\n";
-      infoMsg += "X: rotate right\n";
-      infoMsg += "<-: move left\n";
-      infoMsg += "->: move right\n";
+      infoMsg = "Z or S: rotate left\n";
+      infoMsg += "X or D: rotate right\n";
+      infoMsg += "<- or H: move left\n";
+      infoMsg += "-> or L: move right\n";
+      infoMsg += "DOWN or J: move down\n";
 
       linesDisplay = new JLabel(linesMsg);
       linesDisplay.setForeground(Color.BLACK);

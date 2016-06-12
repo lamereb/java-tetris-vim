@@ -6,9 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.BorderLayout;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.Timer;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 
 public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
@@ -36,6 +40,8 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
   public int lineCount, nextPiece, gameScore;
   public boolean gameOn;
 
+  JLabel gameOverDisplay;
+
   public TetrisPanel(){
     //make a canvas that's PWIDTH by PHEIGHT in size
     setBackground(Color.DARK_GRAY);
@@ -56,13 +62,29 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
       }
     }		//end tetField initialization
 
-    // playPiece = new TetrisPiece(new Point(3,0), (int)(7*Math.random()));
-    playPiece = new TetrisPiece(new Point(3,0), nextPiece);
+    playPiece = new TetrisPiece(new Point(3,0), (int)(7*Math.random()));
 
     timepiece = new Timer(1000,this);
     timepiece.start();
 
+    setLayout(new BorderLayout());
+
+    gameOverDisplay = new JLabel("Game Over", JLabel.CENTER);
+    gameOverDisplay.setForeground(Color.BLACK);
+    gameOverDisplay.setBackground(Color.DARK_GRAY);
+    gameOverDisplay.setOpaque(true);
+    gameOverDisplay.setVisible(false);
+    gameOverDisplay.setBorder(BorderFactory.createLineBorder(Color.GRAY, 4));
+    add(gameOverDisplay, BorderLayout.CENTER);
+
   }		//end TetrisPanel constructor
+
+  // for setting border on gameOverDisplay overlay
+  public Insets getInsets() {
+    int verts = BLOCK_SIZE * 7 + (BLOCK_SIZE/2);
+    int sides = BLOCK_SIZE  + (BLOCK_SIZE/2);
+    return new Insets(verts, sides, verts, sides);
+  }
 
 
   public class TetrisPiece {
@@ -625,38 +647,41 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void renderPiece(){
-      //NOTE: getting Index out of bounds exceptions here cuz of boxes being less than 0
-      //when screen overflows
 
-      tetField[boxes[0].x][boxes[0].y] = true;
-      tetField[boxes[1].x][boxes[1].y] = true;
-      tetField[boxes[2].x][boxes[2].y] = true;
-      tetField[boxes[3].x][boxes[3].y] = true;
+      // NOTE: ArrayIndexOutOfBoundsException here cuz boxes < 0
+      // can use that to end game
+      try {
+        tetField[boxes[0].x][boxes[0].y] = true;
+        tetField[boxes[1].x][boxes[1].y] = true;
+        tetField[boxes[2].x][boxes[2].y] = true;
+        tetField[boxes[3].x][boxes[3].y] = true;
 
-      colField[boxes[0].x][boxes[0].y] = c;
-      colField[boxes[1].x][boxes[1].y] = c;
-      colField[boxes[2].x][boxes[2].y] = c;
-      colField[boxes[3].x][boxes[3].y] = c;
+        colField[boxes[0].x][boxes[0].y] = c;
+        colField[boxes[1].x][boxes[1].y] = c;
+        colField[boxes[2].x][boxes[2].y] = c;
+        colField[boxes[3].x][boxes[3].y] = c;
 
-      //at this point, before creating a new TetrisPiece,
-      //I need to be scanning the y-rows that the boxes are on to see 
-      //if they are all set to true. if so,
-      //they should be cleared and set to false;
-      for(int k = 0; k < 4; k++){
-        if(scanforLineFill(boxes[k].y)){
-          clearLine(boxes[k].y);
-          lineCount++;
-          gameScore += 100;
-          if(lineCount>10){
-            timepiece.setDelay(500);
+        // before creating new TetrisPiece, scan y-rows that boxes are on to see
+        // if all set to true. if so, clear and set to false
+        for(int k = 0; k < 4; k++){
+          if(scanforLineFill(boxes[k].y)){
+            clearLine(boxes[k].y);
+            lineCount++;
+            gameScore += 100;
+            if(lineCount>10){
+              timepiece.setDelay(500);
+            }
           }
         }
-      }
 
-      playPiece = null;
-      playPiece = new TetrisPiece(new Point(3,0), nextPiece);
-      nextPiece = (int)(7*Math.random());
-    }   // end renderPiece 
+        playPiece = null;
+        playPiece = new TetrisPiece(new Point(3,0), nextPiece);
+        nextPiece = (int)(7*Math.random());
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+        gameOn = false;
+      }
+    }      // end renderPiece
 
     //at this point, need to somehow let ScorePanel & NextPiecePanel know to update
 
@@ -827,7 +852,6 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
   }
 
   public void drawPiece(TetrisPiece p, Graphics g){
-
     drawBlock(p.boxes[0].x, p.boxes[0].y,p.c,g);
     drawBlock(p.boxes[1].x, p.boxes[1].y,p.c,g);
     drawBlock(p.boxes[2].x, p.boxes[2].y,p.c,g);
@@ -836,9 +860,7 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
 
   public void paintComponent(Graphics g){
     super.paintComponent(g);
-
     drawPiece(playPiece,g);
-
     for(int i = 0; i < 10; i++){
       for(int k = 0; k < 18; k++){
         if(tetField[i][k]){
@@ -846,7 +868,11 @@ public class TetrisPanel extends JPanel implements ActionListener, KeyListener {
         }
       }
     }
-
+    if (!gameOn) {
+      if (gameOverDisplay.isVisible() == false) {
+        gameOverDisplay.setVisible(true);
+      }
+    }
   }		//end paintComponent
 
   @Override
