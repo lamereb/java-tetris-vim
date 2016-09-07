@@ -1,3 +1,5 @@
+package tetris;
+
 import javax.swing.JFrame;
 
 public class TetrisFrame {
